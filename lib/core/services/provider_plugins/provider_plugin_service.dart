@@ -193,15 +193,16 @@ class ProviderPluginService {
     unawaited(cancellation.whenCancelled.then((_) => close()));
 
     try {
-      final credentials = await PluginOAuthClient(
-        client: client,
-        callbackFactory: _callbackFactory,
-        clock: _clock,
-      ).login(
-        original.providerPlugin!.oauth!,
-        cancellation,
-        onAuthorization: onAuthorization,
-      );
+      final credentials =
+          await PluginOAuthClient(
+            client: client,
+            callbackFactory: _callbackFactory,
+            clock: _clock,
+          ).login(
+            original.providerPlugin!.oauth!,
+            cancellation,
+            onAuthorization: onAuthorization,
+          );
       cancellation.check();
 
       final current = _current(original, store, generation);
@@ -232,9 +233,7 @@ class ProviderPluginService {
 
     // setProviderConfig updates memory before its first await; an in-flight
     // refresh consequently cannot resurrect this cleared session.
-    await store.save(
-      config!.copyWith(providerPluginSession: null, apiKey: ''),
-    );
+    await store.save(config!.copyWith(providerPluginSession: null, apiKey: ''));
   }
 
   ProviderConfig _current(
@@ -307,8 +306,7 @@ class ProviderPluginService {
       return current;
     }
 
-    final key =
-        '$generation:${current.id}:${credentials.sessionId}';
+    final key = '$generation:${current.id}:${credentials.sessionId}';
     final pending = _refreshes[key];
     if (pending != null) return pending;
 
@@ -331,13 +329,11 @@ class ProviderPluginService {
     final client = _clientFactory(original);
     _clients.add(client);
     try {
-      final credentials = await PluginOAuthClient(
-        client: client,
-        clock: _clock,
-      ).refresh(
-        original.providerPlugin!.oauth!,
-        original.providerPluginSession!.credentials,
-      );
+      final credentials = await PluginOAuthClient(client: client, clock: _clock)
+          .refresh(
+            original.providerPlugin!.oauth!,
+            original.providerPluginSession!.credentials,
+          );
       final current = _current(original, store, generation);
       await store.save(
         current.copyWith(

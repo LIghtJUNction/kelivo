@@ -38,6 +38,7 @@ class ProviderOAuthService extends ChangeNotifier {
     _settings = settings;
     ProviderPluginService.instance.bind(settings);
   }
+
   void unbind(SettingsProvider settings) {
     if (identical(settings, _settings)) {
       ProviderPluginService.instance.unbind(settings);

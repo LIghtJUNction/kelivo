@@ -57,8 +57,12 @@ class ProviderPluginManifest {
       throw const FormatException('Plugin id must be a reverse-domain id');
     }
     final protocol = _text(json, 'protocol');
-    if (!const {'openai', 'openai-responses', 'anthropic', 'gemini'}
-        .contains(protocol)) {
+    if (!const {
+      'openai',
+      'openai-responses',
+      'anthropic',
+      'gemini',
+    }.contains(protocol)) {
       throw const FormatException('Unsupported provider plugin protocol');
     }
     final base = _endpoint(_text(json, 'baseUrl'), allowLoopback: true);

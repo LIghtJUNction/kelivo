@@ -11,11 +11,12 @@ import '../auth/oauth_callback.dart';
 import '../auth/oauth_cancellation.dart';
 import '../auth/oauth_pkce.dart';
 
-typedef PluginCallbackFactory = Future<OAuthCallback> Function(
-  Uri authorizationServer, {
-  Uri? loopbackRedirect,
-  String? expectedState,
-});
+typedef PluginCallbackFactory =
+    Future<OAuthCallback> Function(
+      Uri authorizationServer, {
+      Uri? loopbackRedirect,
+      String? expectedState,
+    });
 
 /// Public-client OAuth: external browser + authorization code + S256 PKCE.
 /// Never accepts a client secret, implicit grant, pasted token or ID-token JWT
@@ -129,9 +130,7 @@ class PluginOAuthClient {
   ) => Future.any([
     operation,
     cancellation.whenCancelled.then<T>(
-      (_) => throw const ProviderOAuthException(
-        ProviderOAuthFailure.cancelled,
-      ),
+      (_) => throw const ProviderOAuthException(ProviderOAuthFailure.cancelled),
     ),
   ]);
 
@@ -285,9 +284,7 @@ class PluginOAuthClient {
     return ProviderOAuthCredentials(
       accessToken: access as String,
       refreshToken: refresh as String,
-      expiresAt: _clock().toUtc().add(
-        Duration(seconds: seconds.floor()),
-      ),
+      expiresAt: _clock().toUtc().add(Duration(seconds: seconds.floor())),
       sessionId: previous?.sessionId ?? oauthRandomString(32),
     );
   }

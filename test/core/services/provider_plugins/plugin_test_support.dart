@@ -15,12 +15,13 @@ Map<String, dynamic> manifestJson({bool oauth = true}) => {
   'protocol': 'openai',
   'baseUrl': 'https://api.example.test/v1',
   'models': ['example-model'],
-  if (oauth) 'oauth': {
-    'authorizationEndpoint': 'https://auth.example.test/authorize',
-    'tokenEndpoint': 'https://auth.example.test/token',
-    'clientId': 'public-kelivo-client',
-    'scopes': ['inference', 'offline_access'],
-  },
+  if (oauth)
+    'oauth': {
+      'authorizationEndpoint': 'https://auth.example.test/authorize',
+      'tokenEndpoint': 'https://auth.example.test/token',
+      'clientId': 'public-kelivo-client',
+      'scopes': ['inference', 'offline_access'],
+    },
 };
 
 ProviderConfig pluginConfig({
@@ -33,26 +34,33 @@ ProviderConfig pluginConfig({
 }) {
   final plugin = manifest ?? ProviderPluginManifest.fromJson(manifestJson());
   return ProviderConfig(
-    id: id, enabled: true, name: plugin.name, apiKey: '',
+    id: id,
+    enabled: true,
+    name: plugin.name,
+    apiKey: '',
     baseUrl: plugin.baseUrl.toString(),
     providerType: ProviderPluginService.kindFor(plugin),
     useResponseApi: plugin.protocol == 'openai-responses',
     providerPlugin: plugin,
-    providerPluginSession: plugin.oauth == null ? null : ProviderPluginSession(
-      manifestFingerprint: plugin.fingerprint,
-      credentials: ProviderOAuthCredentials(
-        accessToken: accessToken, refreshToken: refreshToken,
-        expiresAt: expired ? testNow.subtract(const Duration(minutes: 1))
-            : testNow.add(const Duration(hours: 1)),
-        sessionId: sessionId,
-      ),
-    ),
+    providerPluginSession: plugin.oauth == null
+        ? null
+        : ProviderPluginSession(
+            manifestFingerprint: plugin.fingerprint,
+            credentials: ProviderOAuthCredentials(
+              accessToken: accessToken,
+              refreshToken: refreshToken,
+              expiresAt: expired
+                  ? testNow.subtract(const Duration(minutes: 1))
+                  : testNow.add(const Duration(hours: 1)),
+              sessionId: sessionId,
+            ),
+          ),
   );
 }
 
 class MemoryPluginStore implements ProviderPluginStore {
   MemoryPluginStore([Iterable<ProviderConfig> configs = const []])
-      : rows = {for (final config in configs) config.id: config};
+    : rows = {for (final config in configs) config.id: config};
   final Map<String, ProviderConfig> rows;
 
   @override
@@ -61,8 +69,11 @@ class MemoryPluginStore implements ProviderPluginStore {
   Future<void> save(ProviderConfig config, {bool prepend = false}) async {
     rows[config.id] = config;
   }
+
   @override
-  Future<void> remove(String id) async { rows.remove(id); }
+  Future<void> remove(String id) async {
+    rows.remove(id);
+  }
 }
 
 class TestCallback implements OAuthCallback {
@@ -72,16 +83,25 @@ class TestCallback implements OAuthCallback {
   bool closed = false;
 
   @override
-  Future<Uri> authorize(Uri url, Duration timeout, OAuthUrlLauncher launcher)
-      async {
+  Future<Uri> authorize(
+    Uri url,
+    Duration timeout,
+    OAuthUrlLauncher launcher,
+  ) async {
     authorization = url;
-    return redirectUri.replace(queryParameters: {
-      'state': url.queryParameters['state']!, 'code': 'one-time-code',
-    });
+    return redirectUri.replace(
+      queryParameters: {
+        'state': url.queryParameters['state']!,
+        'code': 'one-time-code',
+      },
+    );
   }
+
   @override
   Future<Uri> waitForCallback(Duration timeout) =>
       throw StateError('authorize() is used in these tests');
   @override
-  Future<void> close() async { closed = true; }
+  Future<void> close() async {
+    closed = true;
+  }
 }
