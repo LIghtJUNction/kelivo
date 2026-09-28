@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feat/provider-plugins-oauth
+  pull_request:
+    branches:
+      - master
 
 permissions:
   contents: write
@@ -41,7 +44,7 @@ jobs:
           git add             lib/core/models/provider_plugin.dart             lib/core/models/provider_plugin_session.dart             lib/core/providers/settings_provider.dart             lib/core/services/auth/provider_oauth_service.dart             lib/core/services/network/provider_http_client.dart             lib/core/services/provider_plugins             lib/features/provider/widgets/oauth_login_panel.dart             lib/features/provider/widgets/provider_plugins_panel.dart             lib/l10n             test/core/services/provider_plugins
           if ! git diff --cached --quiet; then
             git commit -m "style: format provider plugin support"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
+            git push origin "HEAD:feat/provider-plugins-oauth"
           fi
 
       - name: Analyze
