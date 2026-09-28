@@ -42,15 +42,24 @@ class _SettingsPluginStore implements ProviderPluginStore {
 
 /// Coordinates account-bound credentials and rejects stale asynchronous work.
 class ProviderPluginService {
-  ProviderPluginService({
+  factory ProviderPluginService({
     ProviderPluginStore? store,
     http.Client Function(ProviderConfig)? clientFactory,
     PluginCallbackFactory? callbackFactory,
     DateTime Function()? clock,
-  }) : _store = store,
-       _clientFactory = clientFactory ?? _clientFor,
-       _callbackFactory = callbackFactory,
-       _clock = clock ?? DateTime.now;
+  }) => ProviderPluginService._(
+    store,
+    clientFactory ?? _clientFor,
+    callbackFactory,
+    clock ?? DateTime.now,
+  );
+
+  ProviderPluginService._(
+    this._store,
+    this._clientFactory,
+    this._callbackFactory,
+    this._clock,
+  );
 
   static final instance = ProviderPluginService();
 
