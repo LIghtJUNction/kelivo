@@ -1,0 +1,54 @@
+name: Provider plugin branch validation
+
+on:
+  push:
+    branches:
+      - feat/provider-plugins-oauth
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.9'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Format and generate localization
+        shell: bash
+        run: |
+          set -euo pipefail
+          dart format             lib/core/models/provider_plugin.dart             lib/core/models/provider_plugin_session.dart             lib/core/providers/settings_provider.dart             lib/core/services/auth/provider_oauth_service.dart             lib/core/services/network/provider_http_client.dart             lib/core/services/provider_plugins             lib/features/provider/widgets/oauth_login_panel.dart             lib/features/provider/widgets/provider_plugins_panel.dart             test/core/services/provider_plugins
+          flutter gen-l10n
+
+      - name: Commit generated files and formatting
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add             lib/core/models/provider_plugin.dart             lib/core/models/provider_plugin_session.dart             lib/core/providers/settings_provider.dart             lib/core/services/auth/provider_oauth_service.dart             lib/core/services/network/provider_http_client.dart             lib/core/services/provider_plugins             lib/features/provider/widgets/oauth_login_panel.dart             lib/features/provider/widgets/provider_plugins_panel.dart             lib/l10n             test/core/services/provider_plugins
+          if ! git diff --cached --quiet; then
+            git commit -m "style: format provider plugin support"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Analyze
+        run: dart analyze --fatal-infos lib test integration_test
+
+      - name: Provider plugin tests
+        run: flutter test test/core/services/provider_plugins
+
+      - name: Full test suite
+        run: flutter test
