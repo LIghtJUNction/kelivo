@@ -50,8 +50,9 @@ class _ProviderPluginsPanelState extends State<ProviderPluginsPanel> {
     } catch (error) {
       if (!mounted) return;
       if (error is ProviderOAuthException &&
-          error.kind == ProviderOAuthFailure.cancelled)
+          error.kind == ProviderOAuthFailure.cancelled) {
         return;
+      }
       final l = AppLocalizations.of(context)!;
       setState(
         () => _error = switch (error) {
@@ -61,11 +62,12 @@ class _ProviderPluginsPanelState extends State<ProviderPluginsPanel> {
         },
       );
     } finally {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _busy = null;
           _cancellation = null;
         });
+      }
     }
   }
 
@@ -180,8 +182,9 @@ class _ProviderPluginsPanelState extends State<ProviderPluginsPanel> {
       final settings = context.read<SettingsProvider>();
       final current = settings.providerConfigs[config.id];
       if (current?.providerPlugin?.fingerprint !=
-          config.providerPlugin?.fingerprint)
+          config.providerPlugin?.fingerprint) {
         return;
+      }
       await settings.setProviderConfig(
         config.id,
         current!.copyWith(apiKey: controller.text.trim()),
@@ -199,8 +202,9 @@ class _ProviderPluginsPanelState extends State<ProviderPluginsPanel> {
         current.providerPlugin?.fingerprint !=
             config.providerPlugin?.fingerprint ||
         current.providerPluginSession?.credentials.sessionId !=
-            config.providerPluginSession?.credentials.sessionId)
+            config.providerPluginSession?.credentials.sessionId) {
       return;
+    }
     await settings.setProviderConfig(
       current.id,
       current.copyWith(models: models.map((model) => model.id).toList()),
